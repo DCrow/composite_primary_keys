@@ -177,4 +177,9 @@ class TestCreate < ActiveSupport::TestCase
     suburb = Suburb.find_or_create_by!(:name => 'New Suburb', :city_id => 3, :suburb_id => 1)
     refute_nil(suburb)
   end
+
+  def test_create_with_id
+    # This create results in a failure
+    OrderPosition.create!(id: [1, 2], name: 'Burger')
+  end
 end

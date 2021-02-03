@@ -181,3 +181,10 @@ create table employees_groups (
   employee_id int not null,
   group_id int not null
 );
+
+create table order_positions (
+  id int not null,
+  subid int not null,
+  name varchar(255) not null,
+  primary key (id, subid)
+);
