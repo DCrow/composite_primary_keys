@@ -48,12 +48,21 @@ class TestCreate < ActiveSupport::TestCase
     end
   end
 
+  def test_create_with_array
+    date = Date.new(2027, 01, 27)
+    tariff = Tariff.create!(id: [10, date], amount: 27)
+    refute_nil(tariff)
+    assert_equal([10, date], tariff.id)
+    assert_equal(date, tariff.start_date)
+    assert_equal(27, tariff.amount)
+  end
+
   def test_create_with_partial_serial
     attributes = {:location_id => 100}
 
     # SQLite does not support an autoincrementing field in a composite key
     if Department.connection.class.name == "ActiveRecord::ConnectionAdapters::SQLite3Adapter"
-      attributes[:id] = 100
+      attributes[:id] = 200
     end
 
     department = Department.new(attributes)
@@ -181,5 +190,22 @@ class TestCreate < ActiveSupport::TestCase
   def test_create_with_id
     # This create results in a failure
     OrderPosition.create!(id: [1, 2], name: 'Burger')
+  end
+
+  def test_cache
+    Suburb.cache do
+      # Suburb does not exist
+      suburb = Suburb.find_by(:city_id => 10, :suburb_id => 10)
+      assert_nil(suburb)
+
+      # Create it
+      suburb = Suburb.create!(:name => 'New Suburb', :city_id => 10, :suburb_id => 10)
+
+      # Should be able to find it
+      suburb = Suburb.find_by(:city_id => 10)
+      refute_nil(suburb)
+      refute_nil(suburb.city_id)
+      refute_nil(suburb.suburb_id)
+    end
   end
 end
